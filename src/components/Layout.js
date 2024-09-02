@@ -3,11 +3,11 @@ import { AuthContext } from '../context/AuthContext';
 import Header from './Header';
 
 function Layout({ children }) {
-  const { email } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <div>
-      <Header email={email} />
+      <Header email={user.email} />
       <div className="main-content">
         {children}
       </div>

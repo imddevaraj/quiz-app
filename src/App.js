@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { QuizProvider } from './context/QuizContext';
 import HomePage from './pages/HomePage';
 import QuizInstructions from './pages/QuizInstructions';
 import Leaderboard from './pages/Leaderboard';
@@ -11,6 +12,7 @@ import './styles/App.css';
 function App() {
   return (
     <AuthProvider>
+      <QuizProvider>
     <Router>
       <div className="App">
         <Routes>
@@ -21,6 +23,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </QuizProvider>
       </AuthProvider>
   );
 }

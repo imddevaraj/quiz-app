@@ -1,37 +1,42 @@
 // src/components/QuizCard.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AnswerOption from './AnswerOption';
 
-const QuizCard = ({ question, options, handleAnswerSubmission }) => {
+const QuizCard = ({ question, handleAnswerSubmission }) => {
   const [selectedAnswers, setSelectedAnswers] = useState([]);
 
   const toggleAnswer = (option) => {
     setSelectedAnswers((prevSelected) => {
-      if (prevSelected.includes(option)) {
-        return prevSelected.filter((answer) => answer !== option);
+      let updatedSelected;
+      if (question.hasMultipleAnswer) {
+        if (prevSelected.includes(option)) {
+          return prevSelected.filter((answer) => answer !== option);
+        } else {
+          return [...prevSelected, option];
+        }
       } else {
-        return [...prevSelected, option];
+       updatedSelected = [option];
       }
+      handleAnswerSubmission(question.id, updatedSelected);
+      return updatedSelected;
     });
   };
-
-  const submitAnswers = () => {
-    handleAnswerSubmission(selectedAnswers);
-    setSelectedAnswers([]); // Reset for the next question
-  };
+  useEffect(() => {
+   handleAnswerSubmission(question.id, selectedAnswers);
+  }, [question.id]);
 
   return (
     <div className="quiz-card">
-      <h3>{question}</h3>
-      {options.map((option, index) => (
+      <h3>{question.text}</h3>
+      {question.answers.map((answer) => (
         <AnswerOption
-          key={index}
-          option={option}
-          isSelected={selectedAnswers.includes(option)}
-          toggleAnswer={toggleAnswer}
+          key={answer.id}
+          option={answer}
+          isSelected={selectedAnswers.some((selected)=> selected.id==answer.id)}
+          toggleAnswer={()=>toggleAnswer(answer)}
+          hasMultipleAnswer={question.hasMultipleAnswer}
         />
       ))}
-      <button onClick={submitAnswers} className="btn">Submit</button>
     </div>
   );
 };

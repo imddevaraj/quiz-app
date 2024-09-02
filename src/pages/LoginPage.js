@@ -2,26 +2,38 @@ import React, { useState,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/LoginPage.css';
+import LoginService from '../services/LoginService';
 
 function LoginPage() {
   const [email, setEmailInput] = useState('devaraj.durairaj@hidglobal.com');
   const [errorMessage, setErrorMessage] = useState('');
-  const { setEmail } = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleEmailChange = (event) => {
+    setEmailInput(event.target.value);
+  };
+
+
+  const handleLogin =  async (e) => {
+    console.log('Logging in with',email);
     e.preventDefault();
     setErrorMessage('');
-    if(email){
-        setEmail(email);
-        navigate('/quiz-instructions');
-    }else{
-        setErrorMessage("Enter HID email address");
+    
+    try{
+      const user = await LoginService.authenticate(email);
+      setUser({ 
+        email: user.email ,
+        name: user.name,
+        id: user.id,
+      });
+
+      navigate('/quiz-instructions');
+      console.log('Logging in with',user);
+    }catch(error){
+      console.error('Error during authentication:', error);
+      setErrorMessage('Authentication failed');
     }
-    // Perform login logic here (e.g., call an API, authenticate user)
-    // If login is successful, redirect to the home page or dashboard
-    console.log('Logging in with', { email });
-   // navigate('/'); // Redirect to the home page after login
   };
 
   return (
@@ -32,12 +44,13 @@ function LoginPage() {
           <div className="error-message">{errorMessage}</div>
         )}
         <div className="form-group">
-        <label>Email:</label>
+        <label htmlFor='email'>Email:</label>
           <input
             type="email"
+            id="email "
             value={email}
             placeholder="Enter your HID email id"
-            onChange={(e) => setEmailInput(e.target.value)}
+            onChange={handleEmailChange}
             required
           />
         </div>
